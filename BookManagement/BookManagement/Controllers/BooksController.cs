@@ -1,12 +1,8 @@
 ﻿using Application.DTOs;
 using Application.UseCases.Commands;
 using Application.UseCases.Queries;
-using Domain.Entities;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Threading.Tasks;
 
 namespace BookManagement.Controllers
 {
@@ -27,9 +23,31 @@ namespace BookManagement.Controllers
 		}
 
 		[HttpGet]
-		public async Task<ActionResult<BookDTO>> GetBookById([FromQuery] GetBookByIdQuery query)
+		[Route("/{id}")]
+		public async Task<ActionResult<BookDTO>> GetBookById([FromRoute] Guid id)
+		{
+			var query = new GetBookByIdQuery { Id = id };
+			return await mediator.Send(query);
+		}
+
+		[HttpGet]
+		public async Task<ActionResult<List<BookDTO>>> GetAllBooks([FromQuery] GetAllBooksQuery query)
 		{
 			return await mediator.Send(query);
 		}
+
+		[HttpPut]
+		public async Task<ActionResult> UpdateBook(UpdateBookCommand command)
+		{
+			await mediator.Send(command);
+			return Ok();
+		}
+		[HttpDelete]
+		public async Task<ActionResult> DeleteBook(DeleteBookCommand command)
+		{
+			await mediator.Send(command);
+			return Ok();
+		}
+
 	}
 }

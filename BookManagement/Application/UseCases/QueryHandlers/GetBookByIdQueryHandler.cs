@@ -1,13 +1,7 @@
 ﻿using Application.DTOs;
 using Application.UseCases.Queries;
-using Domain.Entities;
 using Domain.Repositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.UseCases.QueryHandlers
 {
@@ -19,6 +13,7 @@ namespace Application.UseCases.QueryHandlers
 		{
 			this.repository = repository;
 		}
+
 		public async Task<BookDTO> Handle(GetBookByIdQuery request, CancellationToken cancellationToken)
 		{
 			var book = await repository.GetByIdAsync(request.Id);

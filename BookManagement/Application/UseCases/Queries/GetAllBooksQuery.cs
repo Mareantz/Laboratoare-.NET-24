@@ -3,8 +3,8 @@ using MediatR;
 
 namespace Application.UseCases.Queries
 {
-	public class GetBookByIdQuery : IRequest<BookDTO>
+	public class GetAllBooksQuery : IRequest<List<BookDTO>>
 	{
-		public Guid Id { get; set; }
+
 	}
 }

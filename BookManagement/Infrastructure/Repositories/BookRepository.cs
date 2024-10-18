@@ -1,11 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.Persistance;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories
 {
@@ -23,14 +19,16 @@ namespace Infrastructure.Repositories
 			return book.Id;
 		}
 
-		public Task DeleteAsync(Guid id)
+		public async Task DeleteAsync(Guid id)
 		{
-			throw new NotImplementedException();
+			var book = await context.Books.FindAsync(id);
+			context.Remove(book);
+			await context.SaveChangesAsync();
 		}
 
-		public Task<IEnumerable<Book>> GetAllAsync()
+		public async Task<List<Book>> GetAllAsync()
 		{
-			throw new NotImplementedException();
+			return await context.Books.ToListAsync();
 		}
 
 		public async Task<Book> GetByIdAsync(Guid id)
@@ -38,9 +36,9 @@ namespace Infrastructure.Repositories
 			return await context.Books.FindAsync(id);
 		}
 
-		public Task UpdateAsync(Book book)
+		public async Task UpdateAsync(Book book)
 		{
-			throw new NotImplementedException();
+			await context.SaveChangesAsync();
 		}
 	}
 }

@@ -1,6 +1,8 @@
-﻿namespace Application.DTOs
+﻿using MediatR;
+
+namespace Application.UseCases.Commands
 {
-	public class BookDTO
+	public class UpdateBookCommand : IRequest
 	{
 		public Guid Id { get; set; }
 		public string Title { get; set; }

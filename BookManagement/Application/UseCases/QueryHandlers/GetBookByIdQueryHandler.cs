@@ -23,6 +23,7 @@ namespace Application.UseCases.QueryHandlers
 				Id = book.Id,
 				Title = book.Title,
 				Author = book.Author,
+				ISBN = book.ISBN,
 				PublicationDate = book.PublicationDate
 			};
 		}

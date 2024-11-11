@@ -1,53 +1,73 @@
 ﻿using Application.DTOs;
-using Application.UseCases.Commands;
-using Application.UseCases.Queries;
+using Application.Use_Cases.Commands;
+using Application.Use_Cases.Queries;
+using Application.Utils;
+using Domain.Common;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookManagement.Controllers
 {
-	[Route("api/v1/[controller]")]
-	[ApiController]
-	public class BooksController : ControllerBase
-	{
-		private readonly IMediator mediator;
-		public BooksController(IMediator mediator)
-		{
-			this.mediator = mediator;
-		}
+    [Route("api/v1/[controller]")]
+    [ApiController]
+    public class BooksController : ControllerBase
+    {
+        private readonly IMediator mediator;
 
-		[HttpPost]
-		public async Task<ActionResult<Guid>> CreateBook(CreateBookCommand command)
-		{
-			return await mediator.Send(command);
-		}
+        public BooksController(IMediator mediator)
+        {
+            this.mediator = mediator;
+        }
 
-		[HttpGet]
-		[Route("/{id}")]
-		public async Task<ActionResult<BookDTO>> GetBookById([FromRoute] Guid id)
-		{
-			var query = new GetBookByIdQuery { Id = id };
-			return await mediator.Send(query);
-		}
+        [HttpPost]
+        public async Task<ActionResult<Result<Guid>>> CreateBook(CreateBookCommand command)
+        {
+            var result = await mediator.Send(command);
+            return CreatedAtAction(nameof(GetBookById), new { Id = result.Data }, result.Data);
+        }
 
-		[HttpGet]
-		public async Task<ActionResult<List<BookDTO>>> GetAllBooks([FromQuery] GetAllBooksQuery query)
-		{
-			return await mediator.Send(query);
-		}
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<BookDto>> GetBookById(Guid id)
+        {
+            return await mediator.Send(new GetBookByIdQuery { Id = id });
+        }
 
-		[HttpPut]
-		public async Task<ActionResult> UpdateBook(UpdateBookCommand command)
-		{
-			await mediator.Send(command);
-			return Ok();
-		}
-		[HttpDelete]
-		public async Task<ActionResult> DeleteBook(DeleteBookCommand command)
-		{
-			await mediator.Send(command);
-			return Ok();
-		}
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> Update(Guid id, UpdateBookCommand command)
+        {
+            if (id != command.Id)
+            {
+                return BadRequest("The id should be identical with command.Id");
+            }
 
-	}
+            await mediator.Send(command);
+            return StatusCode(StatusCodes.Status204NoContent);
+        }
+
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await mediator.Send(new DeleteBookCommand(id));
+            return StatusCode(StatusCodes.Status204NoContent);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BookDto>>> GetAll()
+        {
+            var result = await mediator.Send(new GetBooksQuery());
+            return Ok(result);
+        }
+
+        [HttpGet("paginated")]
+        public async Task<ActionResult<PagedResult<BookDto>>> GetFilteredBooks([FromQuery] int page, [FromQuery] int pageSize)
+        {
+            var query = new GetFilteredBooksQuery
+            {
+                Page = page,
+                PageSize = pageSize
+            };
+            var result = await mediator.Send(query);
+            return Ok(result);
+        }
+    }
 }

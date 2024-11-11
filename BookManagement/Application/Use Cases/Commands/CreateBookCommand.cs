@@ -1,8 +1,10 @@
-﻿namespace Application.DTOs
+﻿using Domain.Common;
+using MediatR;
+
+namespace Application.Use_Cases.Commands
 {
-    public class BookDto
+    public class CreateBookCommand : IRequest<Result<Guid>>
     {
-        public Guid Id { get; set; }
         public string Title { get; set; }
         public string Author { get; set; }
         public string ISBN { get; set; }
